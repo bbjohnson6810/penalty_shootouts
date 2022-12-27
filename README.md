@@ -4,7 +4,7 @@
 
 ## Set the tone or seal the deal?
 
-Penalty shootout - used to determine a victor after a tied tournament match in association football - are among the most 
+Penalty shootouts - used to determine a victor after a tied tournament match in association football - are among the most 
 stressful and high-stakes events in all of world sports. One recurring discussion among players, coaches, and pundits is whom 
 to have take each of the allotted five shotes, and in what order. Should the star player shoot first to make a statement and a strong
 opening (set the tone)? Or should they be saved for last to handle the final, highest-pressure moment (seal the deal)?
