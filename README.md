@@ -1,4 +1,4 @@
-# penalty_shootouts
+# Penalty Shootouts
 
 ![](resources/messi_pk.webp)
 
