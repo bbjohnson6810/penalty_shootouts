@@ -13,7 +13,7 @@ Here, I analyzed the success and failure of over >2500 penalty shots spanning >2
 prestigious competitions:
 
 1. FIFA World Cup
-2. UEFA European Championships
+2. UEFA European Championship
 3. CONMEBOL Copa America
 4. CAF Africa Cup of Nations
 5. CONCACAF Gold Cup
