@@ -235,9 +235,28 @@ def must_survive(df):
     return df
 
 
+# function to determine the winner of each match
+
+def winner(df):
+    
+    # subsets for each team
+    team_1 = df[df['take_first'] == 1] # the team that takes first
+    team_2 = df[df['take_first'] == 0] # the team that takes second
+
+    # each team's total score
+    team_1_score = sum(team_1['goal'])
+    team_2_score = sum(team_2['goal'])
+    
+    # define the match winner and loser
+    df['match_winner'] = np.where(team_1_score > team_2_score,
+                        [1]*len(team_1) + [0]*len(team_2),
+                        [0]*len(team_1) + [1]*len(team_2))
+    
+    return df
 # apply the above functions to each matchup
 pk = pk.groupby('matchup', as_index = False).apply(could_win)
 pk = pk.groupby('matchup', as_index = False).apply(must_survive)
+pk = pk.groupby('matchup', as_index = False).apply(winner)
 
 
 # Output the dataframe to file
