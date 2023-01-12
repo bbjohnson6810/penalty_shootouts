@@ -36,6 +36,28 @@ SELECT tournament,
  WHERE neutral_stadium = 0
  GROUP BY tournament
 
+-- 5. How does the probability of winning differ between the first and second team?
+SELECT ROUND(COUNT(DISTINCT match) FILTER (WHERE take_first = 1 AND match_winner = 1) :: numeric / COUNT(DISTINCT match),3) team1_win_freq
+     , ROUND(COUNT(DISTINCT match) FILTER (WHERE take_first = 0 AND match_winner = 1) :: numeric / COUNT(DISTINCT match),3) team2_win_freq
+  FROM penalties
+
+-- 6. What proportion of shootouts make it to the 5th shot?
+SELECT COUNT(DISTINCT match)
+FROM (SELECT match, take_first, MAX(shot_order)
+      FROM penalties
+      GROUP BY match, take_first
+      HAVING MAX(shot_order) >=5 
+      ORDER BY match, take_first DESC) five_plus
+
+-- 7. How often does the second team make it to the 5th shot?
+SELECT COUNT(DISTINCT match)
+FROM (SELECT match, take_first, MAX(shot_order)
+      FROM penalties
+      WHERE take_first = 0
+      GROUP BY match, take_first
+      HAVING MAX(shot_order) >=5 
+      ORDER BY match, take_first DESC) five_plus
+
 ----------------------------------
 --- general shot probabilities ---
 ----------------------------------
@@ -70,3 +92,33 @@ GROUP BY neutral_stadium, attacker_home;
 SELECT sudden_death, ROUND(AVG(goal)*100,2) score_prob
 FROM penalties
 GROUP BY sudden_death;
+
+-- 6. What is the probability of scoring a 'basic' shot: a best-of-five shot that has neither a win nor a loss immediately on the line?
+SELECT ROUND(AVG(goal)*100,2)
+FROM penalties
+WHERE must_survive = 0 AND could_win = 0 AND sudden_death = 0;
+
+-- 7. What is the probability of scoring a shot that could immediately win the match?
+SELECT ROUND(AVG(goal)*100,2)
+FROM penalties
+WHERE could_win = 1;
+
+-- 8. What is the probability of scoring a shot that must score to avoid an immediate loss?
+SELECT ROUND(AVG(goal)*100,2)
+FROM penalties
+WHERE must_survive = 1;
+
+-- 9. How does scoring probability differ between could-win scenarios in best-of-five vs. sudden death rounds?
+SELECT could_win, sudden_death, ROUND(AVG(goal)*100,2)
+FROM penalties
+WHERE must_survive = 0
+GROUP BY could_win, sudden_death
+ORDER BY could_win, sudden_death;
+
+-- 10. How does scoring probability differ between must-survive scenarios in best-of-five vs. sudden death rounds?
+SELECT must_survive, sudden_death, ROUND(AVG(goal)*100,2)
+FROM penalties
+GROUP BY must_survive, sudden_death
+ORDER BY must_survive, sudden_death;
+
+
