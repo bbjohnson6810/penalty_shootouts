@@ -29,8 +29,8 @@ SELECT ROUND(COUNT(DISTINCT match) FILTER (WHERE attacker_home = 1 AND match_win
 
 -- 4. How does home field advantage vary between tournaments?
 SELECT tournament,
-       COUNT(DISTINCT(match)) num_matches,
-       ROUND(COUNT(DISTINCT match) FILTER (WHERE attacker_home = 1 AND match_winner = 1) :: numeric / COUNT(DISTINCT match),3) home_win_freq
+       COUNT(DISTINCT(match)) num_matches
+     , ROUND(COUNT(DISTINCT match) FILTER (WHERE attacker_home = 1 AND match_winner = 1) :: numeric / COUNT(DISTINCT match),3) home_win_freq
      , ROUND(COUNT(DISTINCT match) FILTER (WHERE attacker_home = 0 AND match_winner = 1) :: numeric / COUNT(DISTINCT match),3) away_win_freq
   FROM penalties
  WHERE neutral_stadium = 0
@@ -58,6 +58,17 @@ FROM (SELECT match, take_first, MAX(shot_order)
       HAVING MAX(shot_order) >=5 
       ORDER BY match, take_first DESC) five_plus
 
+-- 8. Which team sees more high-stakes scenarios?
+SELECT take_first 
+    , SUM(must_survive + could_win) high_stakes
+    , COUNT(*) - SUM(must_survive + could_win) low_stakes
+    , ROUND(SUM(must_survive + could_win)::numeric / COUNT(*),3) high_freq
+    , ROUND((COUNT(*) - SUM(must_survive + could_win))::numeric / COUNT(*),3) low_freq
+FROM penalties
+GROUP BY take_first
+ORDER BY take_first DESC;
+
+
 ----------------------------------
 --- general shot probabilities ---
 ----------------------------------
@@ -83,39 +94,45 @@ FROM penalties
 GROUP BY tournament, take_first
 ORDER BY tournament, take_first DESC;
 
--- 4. How does scoring probability differ in a home, away, or neutral stadium?
+-- 4. How does scoring probability vary with each shot?
+SELECT COUNT(*) n, take_first, shot_order, ROUND(AVG(goal)*100,2) score_prob
+FROM penalties
+GROUP BY take_first, shot_order
+ORDER BY shot_order, take_first DESC;
+
+-- 5. How does scoring probability differ in a home, away, or neutral stadium?
 SELECT neutral_stadium, attacker_home, ROUND(AVG(goal)*100,2) score_prob
 FROM penalties
 GROUP BY neutral_stadium, attacker_home;
 
--- 5. How does scoring probability differ between best-of-five and sudden death rounds?
+-- 6. How does scoring probability differ between best-of-five and sudden death rounds?
 SELECT sudden_death, ROUND(AVG(goal)*100,2) score_prob
 FROM penalties
 GROUP BY sudden_death;
 
--- 6. What is the probability of scoring a 'basic' shot: a best-of-five shot that has neither a win nor a loss immediately on the line?
+-- 7. What is the probability of scoring a 'basic' shot: a best-of-five shot that has neither a win nor a loss immediately on the line?
 SELECT ROUND(AVG(goal)*100,2)
 FROM penalties
 WHERE must_survive = 0 AND could_win = 0 AND sudden_death = 0;
 
--- 7. What is the probability of scoring a shot that could immediately win the match?
+-- 8. What is the probability of scoring a shot that could immediately win the match?
 SELECT ROUND(AVG(goal)*100,2)
 FROM penalties
 WHERE could_win = 1;
 
--- 8. What is the probability of scoring a shot that must score to avoid an immediate loss?
+-- 9. What is the probability of scoring a shot that must score to avoid an immediate loss?
 SELECT ROUND(AVG(goal)*100,2)
 FROM penalties
 WHERE must_survive = 1;
 
--- 9. How does scoring probability differ between could-win scenarios in best-of-five vs. sudden death rounds?
-SELECT could_win, sudden_death, ROUND(AVG(goal)*100,2)
-FROM penalties
-WHERE must_survive = 0
-GROUP BY could_win, sudden_death
-ORDER BY could_win, sudden_death;
+-- 10. How does scoring probability differ between could-win scenarios in best-of-five vs. sudden death rounds?
+    SELECT could_win, sudden_death, ROUND(AVG(goal)*100,2)
+    FROM penalties
+    WHERE must_survive = 0
+    GROUP BY could_win, sudden_death
+    ORDER BY could_win, sudden_death;
 
--- 10. How does scoring probability differ between must-survive scenarios in best-of-five vs. sudden death rounds?
+-- 11. How does scoring probability differ between must-survive scenarios in best-of-five vs. sudden death rounds?
 SELECT must_survive, sudden_death, ROUND(AVG(goal)*100,2)
 FROM penalties
 GROUP BY must_survive, sudden_death

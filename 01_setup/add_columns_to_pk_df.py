@@ -365,11 +365,11 @@ def winner(df):
 
 
 # apply the above functions to each match
-pk = pk.groupby('match', as_index = False).apply(could_win)
-pk = pk.groupby('match', as_index = False).apply(must_survive)
-pk = pk.groupby('match', as_index = False).apply(running_score)
-pk = pk.groupby('match', as_index = False).apply(running_dif)
-pk = pk.groupby('match', as_index = False).apply(winner)
+pk = pk.groupby('match', as_index = False, group_keys = False).apply(could_win)
+pk = pk.groupby('match', as_index = False, group_keys = False).apply(must_survive)
+pk = pk.groupby('match', as_index = False, group_keys = False).apply(running_score)
+pk = pk.groupby('match', as_index = False, group_keys = False).apply(running_dif)
+pk = pk.groupby('match', as_index = False, group_keys = False).apply(winner)
 
 # rearrange columns
 cols = pk.columns.tolist()
